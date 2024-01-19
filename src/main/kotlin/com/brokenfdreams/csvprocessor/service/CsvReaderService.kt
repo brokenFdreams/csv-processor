@@ -36,4 +36,15 @@ class CsvReaderService(private val csvReader: CsvReader) {
             .mapNotNull { it[columnName] }
             .toList()
     }
+
+    fun transformCsvToJsonMap(
+        fileInputStream: InputStream,
+        keyHeaderName: String,
+        valueHeaderName: String
+    ): Map<String, String> {
+        return csvReader.readAllWithHeader(fileInputStream)
+            .mapNotNull { it[keyHeaderName]?.let { key -> it[valueHeaderName]?.let { value -> Pair(key, value) } } }
+            .sortedBy { it.first }
+            .toMap()
+    }
 }

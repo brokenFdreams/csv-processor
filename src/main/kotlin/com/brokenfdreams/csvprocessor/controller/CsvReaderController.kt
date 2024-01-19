@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
 @Tag(name = "CsvReader", description = "Reads csv file and process it")
-@RestController("read")
+@RestController("read/csv")
 class CsvReaderController(
     private val csvReaderService: CsvReaderService,
     private val comparatorService: ComparatorService
@@ -42,15 +42,27 @@ class CsvReaderController(
         )
     }
 
+    @Operation(description = "Compare csv column values to json field names")
     @PostMapping("compare-csv-to-json", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun compareCsvToJson(
         @RequestPart csv: MultipartFile,
         @RequestPart json: MultipartFile,
-        @RequestParam jsonFieldPath: List<String>,
-        @RequestParam csvFieldName: String
+        @RequestPart csvFieldName: String,
+        @RequestParam jsonFieldPath: List<String>
     ): ResponseEntity<String> {
         return ResponseEntity.ok(
             comparatorService.compareCsvToJsonField(csv.inputStream, csvFieldName, json.inputStream, jsonFieldPath)
+        )
+    }
+
+    @PostMapping("transform-csv-to-json", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun transformCsvToJson(
+        @RequestPart csv: MultipartFile,
+        @RequestPart csvFieldNameToJsonKey: String,
+        @RequestPart csvFieldNameToJsonValue: String
+    ): ResponseEntity<Map<String, String>> {
+        return ResponseEntity.ok(
+            csvReaderService.transformCsvToJsonMap(csv.inputStream, csvFieldNameToJsonKey, csvFieldNameToJsonValue)
         )
     }
 }
