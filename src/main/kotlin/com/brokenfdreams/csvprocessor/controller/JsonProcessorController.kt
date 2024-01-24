@@ -1,5 +1,6 @@
 package com.brokenfdreams.csvprocessor.controller
 
+import com.brokenfdreams.csvprocessor.model.Status
 import com.brokenfdreams.csvprocessor.service.JsonProcessorService
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
@@ -25,6 +26,21 @@ class JsonProcessorController(private val jsonProcessorService: JsonProcessorSer
             jsonProcessorService.addNewValues(
                 originalJson.inputStream,
                 newValues.inputStream,
+                jsonFieldPath
+            )
+        )
+    }
+
+    @PostMapping("compare", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun compareTwoFiles(
+        @RequestPart firstJsonFile: MultipartFile,
+        @RequestPart secondJsonFile: MultipartFile,
+        @RequestParam jsonFieldPath: List<String>
+    ): ResponseEntity<Map<String, Status>> {
+        return ResponseEntity.ok(
+            jsonProcessorService.compare(
+                firstJsonFile.inputStream,
+                secondJsonFile.inputStream,
                 jsonFieldPath
             )
         )

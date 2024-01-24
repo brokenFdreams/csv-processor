@@ -19,7 +19,7 @@ class ComparatorService(
         val jsonValues = jsonReaderService.readJsonValues(jsonInputStream, jsonFieldPath).keys
         val csvValues = csvReaderService.readOneColumnToList(csvInputStream, csvFieldName)
 
-        val result = csvValues.map { listOf(it, (if (it in jsonValues) Status.PRESENT else Status.MISSING).name) }
+        val result = csvValues.map { listOf(it, (if (it in jsonValues) Status.PRESENT else Status.MISSING_LEFT).name) }
             .toList()
         return csvWriterService.writeMap(result)
     }
